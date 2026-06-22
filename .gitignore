@@ -1,0 +1,4 @@
+*.xlsx
+__pycache__/
+_debug*.txt
+_search.txt

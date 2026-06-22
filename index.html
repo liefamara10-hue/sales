@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>直营门店分销缺口看板</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:#f5f5f5; color:#333; font-size:15px; line-height:1.5; -webkit-tap-highlight-color:transparent; }
+.header { background:#1a73e8; color:#fff; padding:12px 16px; position:sticky; top:0; z-index:100; display:flex; align-items:center; gap:12px; box-shadow:0 2px 4px rgba(0,0,0,.15); }
+.header h1 { font-size:17px; font-weight:600; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.header .back { background:none; border:none; color:#fff; font-size:24px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:50%; visibility:hidden; }
+.header .back.show { visibility:visible; }
+.header .back:active { background:rgba(255,255,255,.2); }
+.header .meta { font-size:12px; opacity:.85; }
+.container { padding:12px; max-width:800px; margin:0 auto; }
+/* Manager cards */
+.card-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.card { background:#fff; border-radius:10px; padding:14px; box-shadow:0 1px 3px rgba(0,0,0,.1); cursor:pointer; transition:transform .15s; }
+.card:active { transform:scale(.97); }
+.card .name { font-size:16px; font-weight:600; margin-bottom:6px; color:#1a73e8; }
+.card .stats { display:flex; gap:12px; font-size:12px; color:#666; }
+.card .stat { display:flex; flex-direction:column; }
+.card .stat .num { font-size:18px; font-weight:700; }
+.card .stat.red .num { color:#d93025; }
+.card .stat.green .num { color:#188038; }
+/* Store list */
+.store-list {}
+.store-item { background:#fff; border-radius:10px; margin-bottom:8px; box-shadow:0 1px 2px rgba(0,0,0,.08); overflow:hidden; }
+.store-header { padding:12px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; }
+.store-header:active { background:#f8f9fa; }
+.store-info { flex:1; min-width:0; }
+.store-name { font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.store-type { font-size:11px; color:#888; margin-top:2px; }
+.store-badge { font-size:11px; padding:3px 8px; border-radius:10px; font-weight:600; white-space:nowrap; }
+.badge-red { background:#fce8e6; color:#c5221f; }
+.badge-yellow { background:#fef7e0; color:#e37400; }
+.badge-green { background:#e6f4ea; color:#137333; }
+.badge-gray { background:#f1f3f4; color:#5f6368; }
+.store-arrow { font-size:14px; color:#999; transition:transform .2s; }
+.store-item.open .store-arrow { transform:rotate(90deg); }
+/* Gap list */
+.gap-list { display:none; border-top:1px solid #eee; background:#fafafa; }
+.store-item.open .gap-list { display:block; }
+.gap-item { padding:10px 14px 10px 28px; border-bottom:1px solid #f0f0f0; font-size:13px; display:flex; align-items:flex-start; gap:8px; }
+.gap-item:last-child { border-bottom:none; }
+.gap-line { font-size:10px; color:#888; background:#eee; padding:1px 5px; border-radius:4px; white-space:nowrap; flex-shrink:0; }
+.gap-text { flex:1; }
+.gap-choose { border-left:3px dashed #e37400; background:#fffbf0; }
+.gap-choose .gap-badge { font-size:10px; background:#e37400; color:#fff; padding:1px 5px; border-radius:3px; margin-right:6px; }
+.empty-state { text-align:center; padding:40px 20px; color:#999; }
+.empty-state .icon { font-size:40px; margin-bottom:10px; }
+/* Summary bar */
+.summary { background:#fff; border-radius:10px; padding:12px 14px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.08); display:flex; justify-content:space-around; text-align:center; }
+.summary-item .num { font-size:20px; font-weight:700; }
+/* Loading */
+.loading { text-align:center; padding:60px 20px; color:#999; }
+.spinner { width:36px; height:36px; border:3px solid #e0e0e0; border-top-color:#1a73e8; border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 15px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+/* Manager header in detail */
+.mgr-header { background:#fff; border-radius:10px; padding:14px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.08); }
+.mgr-name { font-size:18px; font-weight:700; color:#1a73e8; }
+.mgr-stats { font-size:12px; color:#666; margin-top:4px; }
+/* Filters */
+.filter-bar { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+.filter-btn { font-size:12px; padding:6px 12px; border-radius:14px; border:1px solid #ddd; background:#fff; cursor:pointer; white-space:nowrap; }
+.filter-btn.active { background:#1a73e8; color:#fff; border-color:#1a73e8; }
+/* Footer */
+.footer { text-align:center; padding:20px; color:#999; font-size:11px; }
+/* Rules card */
+.rules-card { background:#fff; border-radius:10px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.08); overflow:hidden; }
+.rules-header { padding:12px 14px; display:flex; align-items:center; gap:8px; cursor:pointer; }
+.rules-header:active { background:#f8f9fa; }
+.rules-title { font-size:14px; font-weight:500; color:#1a73e8; flex:1; }
+.rules-arrow { font-size:14px; color:#999; transition:transform .2s; }
+.rules-card.open .rules-arrow { transform:rotate(90deg); }
+.rules-body { display:none; padding:0 14px 14px; }
+.rules-card.open .rules-body { display:block; }
+.rule-item { font-size:12px; color:#666; padding:6px 0; border-bottom:1px solid #f5f5f5; line-height:1.6; }
+.rule-item:last-child { border-bottom:none; }
+.rule-item b { color:#333; }
+.tag-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin:0 2px; vertical-align:middle; }
+.dot-red { background:#c5221f; }
+.dot-yellow { background:#e37400; }
+.dot-green { background:#137333; }
+.dot-gray { background:#5f6368; }
+</style>
+</head>
+<body>
+
+<div class="header" id="header">
+  <button class="back" id="backBtn" onclick="goBack()">&#8592;</button>
+  <h1 id="title">直营门店分销缺口看板</h1>
+  <span class="meta" id="headerMeta"></span>
+</div>
+
+<div class="container" id="mainContent">
+  <div class="loading"><div class="spinner"></div>加载数据中...</div>
+</div>
+
+<div class="footer" id="footer"></div>
+
+<script>
+// ====== 数据加载 ======
+let DATA = null;
+let currentView = 'overview'; // 'overview' | 'manager'
+let currentManager = null;
+let currentFilter = 'all';
+
+async function init() {
+  try {
+    const resp = await fetch('data.json');
+    DATA = await resp.json();
+  } catch(e) {
+    document.getElementById('mainContent').innerHTML =
+      '<div class="empty-state"><div class="icon">⚠</div>无法加载数据文件 data.json<br><small>请确保与 index.html 在同一目录</small></div>';
+    return;
+  }
+  document.getElementById('footer').textContent =
+    '生成时间: ' + DATA.generated;
+  renderOverview();
+}
+
+// ====== 总览视图 ======
+function renderOverview() {
+  currentView = 'overview';
+  currentManager = null;
+  document.getElementById('title').textContent = '直营门店分销缺口看板';
+  document.getElementById('backBtn').classList.remove('show');
+  document.getElementById('headerMeta').textContent = DATA.managers.length + '位负责人';
+
+  // 规则说明（置顶）
+  let html = renderRules();
+  html += '<div class="card-grid">';
+  for (const m of DATA.managers) {
+    const noGap = m.storeCount - m.gapStoreCount;
+    html += '<div class="card" data-manager="' + escHtml(m.name) + '" onclick="onCardClick(this)">';
+    html += '<div class="name">' + escHtml(m.name) + '</div>';
+    html += '<div class="stats">';
+    html += '<div class="stat"><span class="num">' + m.storeCount + '</span>门店</div>';
+    html += '<div class="stat red"><span class="num">' + m.gapStoreCount + '</span>有缺口</div>';
+    html += '<div class="stat green"><span class="num">' + noGap + '</span>无缺口</div>';
+    html += '</div></div>';
+  }
+  html += '</div>';
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function renderRules() {
+  return '<div class="rules-card open" id="rulesCard">'
+    + '<div class="rules-header" onclick="this.parentElement.classList.toggle(\'open\')">'
+    + '<span class="rules-title">&#9432; 缺口判定规则说明</span>'
+    + '<span class="rules-arrow">&#8250;</span>'
+    + '</div>'
+    + '<div class="rules-body">'
+    + '<div class="rule-item"><b>产品匹配</b>：只看品牌+品类名，不看规格与包装。例如"金龙鱼芝麻香油400ML"与"金龙鱼芝麻香油220ML"视为同一产品。</div>'
+    + '<div class="rule-item"><b>门店类型</b>：商超A/B→商超AB，农贸菜场店→农贸店。流通批发/批发流通/其它客户无分销标准，标注"无要求"。</div>'
+    + '<div class="rule-item"><b>N选1</b>：标"需2选1"表示该组产品中只需覆盖1个即算满足。门店一个都没覆盖才计为缺口。</div>'
+    + '<div class="rule-item"><b>颜色标记</b>：<span class="tag-dot dot-red"></span>红色=有缺口 <span class="tag-dot dot-yellow"></span>黄色=1-5个缺口 <span class="tag-dot dot-green"></span>绿色=无缺口 <span class="tag-dot dot-gray"></span>灰色=无分销标准</div>'
+    + '</div>'
+    + '</div>';
+}
+
+// ====== 负责人详情 ======
+function showManager(name) {
+  currentView = 'manager';
+  currentManager = DATA.managers.find(m => m.name === name);
+  if (!currentManager) return;
+  currentFilter = 'all';
+
+  document.getElementById('title').textContent = currentManager.name;
+  document.getElementById('backBtn').classList.add('show');
+  document.getElementById('headerMeta').textContent = currentManager.storeCount + '家门店';
+
+  renderManagerDetail();
+}
+
+function renderManagerDetail() {
+  const m = currentManager;
+  let stores = m.stores;
+
+  // Filter
+  if (currentFilter === 'gap') stores = stores.filter(s => s.gaps.length > 0);
+  else if (currentFilter === 'nogap') stores = stores.filter(s => s.gaps.length === 0 && s.hasStandard);
+  else if (currentFilter === 'nostd') stores = stores.filter(s => !s.hasStandard);
+
+  let html = '';
+  // Summary
+  html += '<div class="summary">';
+  html += '<div class="summary-item"><div class="num" style="color:#1a73e8">' + m.storeCount + '</div>总门店</div>';
+  html += '<div class="summary-item"><div class="num" style="color:#d93025">' + m.gapStoreCount + '</div>有缺口</div>';
+  html += '<div class="summary-item"><div class="num" style="color:#188038">' + (m.storeCount - m.gapStoreCount) + '</div>无缺口</div>';
+  html += '</div>';
+
+  // Filter bar
+  html += '<div class="filter-bar">';
+  html += '<button class="filter-btn' + (currentFilter==='all'?' active':'') + '" onclick="setFilter(\'all\')">全部</button>';
+  html += '<button class="filter-btn' + (currentFilter==='gap'?' active':'') + '" onclick="setFilter(\'gap\')">有缺口</button>';
+  html += '<button class="filter-btn' + (currentFilter==='nogap'?' active':'') + '" onclick="setFilter(\'nogap\')">无缺口</button>';
+  html += '<button class="filter-btn' + (currentFilter==='nostd'?' active':'') + '" onclick="setFilter(\'nostd\')">无分销标准</button>';
+  html += '</div>';
+
+  html += '<div class="store-list">';
+  for (const s of stores) {
+    const gapCount = s.gaps.length;
+    let badgeCls, badgeText;
+    if (!s.hasStandard) {
+      badgeCls = 'badge-gray'; badgeText = '无要求';
+    } else if (gapCount === 0) {
+      badgeCls = 'badge-green'; badgeText = '无缺口';
+    } else if (gapCount <= 5) {
+      badgeCls = 'badge-yellow'; badgeText = gapCount + '个缺口';
+    } else {
+      badgeCls = 'badge-red'; badgeText = gapCount + '个缺口';
+    }
+
+    html += '<div class="store-item" onclick="toggleStore(this, event)">';
+    html += '<div class="store-header">';
+    html += '<div class="store-info">';
+    html += '<div class="store-name">' + escHtml(s.name) + '</div>';
+    html += '<div class="store-type">' + escHtml(s.type) + (s.hasStandard ? '' : ' · 无分销标准') + '</div>';
+    html += '</div>';
+    html += '<span class="store-badge ' + badgeCls + '">' + badgeText + '</span>';
+    html += '<span class="store-arrow">&#8250;</span>';
+    html += '</div>';
+
+    // Gap list
+    if (gapCount > 0) {
+      html += '<div class="gap-list">';
+      for (const g of s.gaps) {
+        if (g.requirement === '必须') {
+          html += '<div class="gap-item">';
+          html += '<span class="gap-line">' + escHtml(g.productLine || '') + '</span>';
+          html += '<span class="gap-text">' + escHtml(g.product) + '</span>';
+          html += '</div>';
+        } else {
+          // N选1
+          html += '<div class="gap-item gap-choose">';
+          html += '<span class="gap-line">' + escHtml(g.productLine || '') + '</span>';
+          html += '<span class="gap-text">';
+          html += '<span class="gap-badge">需' + escHtml(g.requirement) + '</span>';
+          html += g.group.map(p => escHtml(p)).join(' / ');
+          html += '</span>';
+          html += '</div>';
+        }
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+
+  if (stores.length === 0) {
+    html += '<div class="empty-state"><div class="icon">✓</div>当前筛选条件下无门店</div>';
+  }
+
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  renderManagerDetail();
+}
+
+function toggleStore(el, ev) {
+  el.classList.toggle('open');
+  ev.stopPropagation();
+}
+
+function onCardClick(el) {
+  showManager(el.dataset.manager);
+}
+
+function goBack() {
+  if (currentView === 'manager') {
+    renderOverview();
+  }
+}
+
+// ====== 工具函数 ======
+function esc(s) {
+  return (s||'').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ====== 启动 ======
+init();
+</script>
+</body>
+</html>
