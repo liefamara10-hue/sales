@@ -59,6 +59,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .gap-choose .gap-badge { font-size:10px; background:#e37400; color:#fff; padding:1px 5px; border-radius:3px; margin-right:6px; }
 .gap-bulk { border-left:3px solid #9334e6; background:#faf5ff; }
 .gap-bulk .bulk-badge { font-size:10px; background:#9334e6; color:#fff; padding:1px 5px; border-radius:3px; margin-right:6px; }
+.hl-product { background:#fef7e0; padding:1px 3px; border-radius:3px; }
+.hl-tag { font-size:9px; color:#e37400; font-weight:600; }
 .empty-state { text-align:center; padding:40px 20px; color:#999; }
 .empty-state .icon { font-size:40px; margin-bottom:10px; }
 /* Summary */
@@ -314,7 +316,12 @@ function renderManagerDetail() {
           html += '<span class="gap-line">' + escHtml(g.productLine || '') + '</span>';
           html += '<span class="gap-text">';
           html += '<span class="gap-badge bulk-badge">' + escHtml(g.note || '') + '</span>';
-          html += g.group.map(function(p) { return escHtml(p); }).join(' / ');
+          var hlSet = (g.highlights || []);
+          html += g.group.map(function(p) {
+            var s = escHtml(p);
+            if (hlSet.indexOf(p) >= 0) s = '<span class="hl-product">' + s + ' <b class="hl-tag">优质稻</b></span>';
+            return s;
+          }).join(' / ');
           if (gnote) html += '<span class="gap-note-txt">' + escHtml(gnote.substring(0, 30)) + '</span>';
           html += '</span>';
           html += '<span class="gap-note-btn' + (gnote ? ' has-note' : '') + '" onclick="openGapNote(event, \'' + esc(m.name) + '\', \'' + esc(s.name) + '\', ' + gi + ')">&#9998;</span>';
