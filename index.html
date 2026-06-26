@@ -342,7 +342,7 @@ function openGapNote(ev, mgr, store, idx) {
 
 function setFilter(f) { currentFilter = f; renderManagerDetail(); }
 
-function toggleStore(el, ev) { el.classList.toggle('open'); ev.stopPropagation(); }
+function toggleStore(el, ev) { el.parentElement.classList.toggle('open'); ev.stopPropagation(); }
 
 function onCardClick(el) { showManager(el.dataset.manager); }
 
