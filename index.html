@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>直营门店分销缺口看板</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -174,7 +177,7 @@ function deleteNote() {
 // ====== Data loading ======
 async function init() {
   try {
-    var resp = await fetch('data.json');
+    var resp = await fetch('data.json?v=' + Date.now());
     DATA = await resp.json();
   } catch(e) {
     document.getElementById('mainContent').innerHTML =
