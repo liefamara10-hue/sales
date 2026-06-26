@@ -294,10 +294,24 @@ def read_store_sales(filepath):
     return stores
 
 
-def build_data():
-    sales_file = os.path.join(BASE_DIR, '南山直营门店销量-0616.xlsx')
-    std_file = os.path.join(BASE_DIR, '深圳类直营概况汇报.xlsx')
+def find_file(*keywords):
+    """在脚本目录下找包含所有关键词的 xlsx 文件"""
+    for f in os.listdir(BASE_DIR):
+        if f.endswith('.xlsx') and all(k in f for k in keywords):
+            return os.path.join(BASE_DIR, f)
+    return None
 
+def build_data():
+    sales_file = find_file('销量')
+    std_file = find_file('概况')
+
+    if not sales_file:
+        raise FileNotFoundError('未找到销量表（文件名需含"销量"）')
+    if not std_file:
+        raise FileNotFoundError('未找到概况表（文件名需含"概况"）')
+
+    print(f'销量表: {os.path.basename(sales_file)}')
+    print(f'标准表: {os.path.basename(std_file)}')
     print('读取分销标准...')
     std_products, std_groups = read_distribution_standard(std_file)
     print(f'  分销标准产品数: {len(std_products)}')
@@ -423,7 +437,38 @@ def build_data():
     print(f'\n输出: {output_file}')
     print(f'负责人数: {len(managers)}')
     print(f'有缺口的门店数: {sum(m["gapStoreCount"] for m in managers)}')
-    print('完成！')
+
+    # 自动提交到 GitHub
+    auto_git_push()
+
+
+def auto_git_push():
+    """自动 git add + commit + push"""
+    import subprocess, sys
+    repo_dir = BASE_DIR
+
+    # 检查是否有变更
+    result = subprocess.run(
+        ['git', '-C', repo_dir, 'status', '--porcelain', 'data.json'],
+        capture_output=True, text=True
+    )
+    if not result.stdout.strip():
+        print('data.json 无变更，跳过提交')
+        return
+
+    print('\n提交到 GitHub...')
+    cmds = [
+        ['git', '-C', repo_dir, 'add', 'data.json'],
+        ['git', '-C', repo_dir, 'commit', '-m', f'更新数据 {date.today().isoformat()}'],
+        ['git', '-C', repo_dir, 'push'],
+    ]
+    for cmd in cmds:
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode != 0:
+            print(f'  失败: {" ".join(cmd)}')
+            print(f'  {r.stderr.strip()}')
+            return
+    print('  已推送到 GitHub')
 
 
 if __name__ == '__main__':
