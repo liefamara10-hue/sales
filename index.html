@@ -14,7 +14,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .header .back:active { background:rgba(255,255,255,.2); }
 .header .meta { font-size:12px; opacity:.85; }
 .container { padding:12px; max-width:800px; margin:0 auto; }
-/* Manager cards */
+/* Cards */
 .card-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .card { background:#fff; border-radius:10px; padding:14px; box-shadow:0 1px 3px rgba(0,0,0,.1); cursor:pointer; transition:transform .15s; }
 .card:active { transform:scale(.97); }
@@ -27,11 +27,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 /* Store list */
 .store-list {}
 .store-item { background:#fff; border-radius:10px; margin-bottom:8px; box-shadow:0 1px 2px rgba(0,0,0,.08); overflow:hidden; }
-.store-header { padding:12px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; }
+.store-header { padding:12px 14px; display:flex; align-items:center; gap:8px; cursor:pointer; }
 .store-header:active { background:#f8f9fa; }
 .store-info { flex:1; min-width:0; }
-.store-name { font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.store-name { font-size:14px; font-weight:500; }
 .store-type { font-size:11px; color:#888; margin-top:2px; }
+.store-note-icon { font-size:18px; cursor:pointer; padding:4px; flex-shrink:0; opacity:.5; }
+.store-note-icon.has-note { opacity:1; }
+.store-note-preview { font-size:10px; color:#1a73e8; background:#e8f0fe; padding:2px 6px; border-radius:8px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-left:4px; flex-shrink:0; }
 .store-badge { font-size:11px; padding:3px 8px; border-radius:10px; font-weight:600; white-space:nowrap; }
 .badge-red { background:#fce8e6; color:#c5221f; }
 .badge-yellow { background:#fef7e0; color:#e37400; }
@@ -42,32 +45,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 /* Gap list */
 .gap-list { display:none; border-top:1px solid #eee; background:#fafafa; }
 .store-item.open .gap-list { display:block; }
-.gap-item { padding:10px 14px 10px 28px; border-bottom:1px solid #f0f0f0; font-size:13px; display:flex; align-items:flex-start; gap:8px; }
+.gap-item { padding:10px 14px 10px 28px; border-bottom:1px solid #f0f0f0; font-size:13px; display:flex; align-items:flex-start; gap:6px; position:relative; }
 .gap-item:last-child { border-bottom:none; }
 .gap-line { font-size:10px; color:#888; background:#eee; padding:1px 5px; border-radius:4px; white-space:nowrap; flex-shrink:0; }
 .gap-text { flex:1; }
+.gap-note-btn { font-size:16px; cursor:pointer; padding:2px 6px; flex-shrink:0; opacity:.4; }
+.gap-note-btn.has-note { opacity:1; }
+.gap-note-txt { font-size:10px; color:#1a73e8; display:block; margin-top:2px; }
 .gap-choose { border-left:3px dashed #e37400; background:#fffbf0; }
 .gap-choose .gap-badge { font-size:10px; background:#e37400; color:#fff; padding:1px 5px; border-radius:3px; margin-right:6px; }
 .empty-state { text-align:center; padding:40px 20px; color:#999; }
 .empty-state .icon { font-size:40px; margin-bottom:10px; }
-/* Summary bar */
+/* Summary */
 .summary { background:#fff; border-radius:10px; padding:12px 14px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.08); display:flex; justify-content:space-around; text-align:center; }
 .summary-item .num { font-size:20px; font-weight:700; }
 /* Loading */
 .loading { text-align:center; padding:60px 20px; color:#999; }
 .spinner { width:36px; height:36px; border:3px solid #e0e0e0; border-top-color:#1a73e8; border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 15px; }
 @keyframes spin { to { transform:rotate(360deg); } }
-/* Manager header in detail */
-.mgr-header { background:#fff; border-radius:10px; padding:14px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.08); }
-.mgr-name { font-size:18px; font-weight:700; color:#1a73e8; }
-.mgr-stats { font-size:12px; color:#666; margin-top:4px; }
 /* Filters */
 .filter-bar { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
 .filter-btn { font-size:12px; padding:6px 12px; border-radius:14px; border:1px solid #ddd; background:#fff; cursor:pointer; white-space:nowrap; }
 .filter-btn.active { background:#1a73e8; color:#fff; border-color:#1a73e8; }
+.export-btn { font-size:11px; padding:6px 10px; border-radius:14px; border:1px solid #1a73e8; background:#fff; color:#1a73e8; cursor:pointer; white-space:nowrap; margin-left:auto; }
+.export-btn:active { background:#e8f0fe; }
 /* Footer */
 .footer { text-align:center; padding:20px; color:#999; font-size:11px; }
-/* Rules card */
+/* Rules */
 .rules-card { background:#fff; border-radius:10px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.08); overflow:hidden; }
 .rules-header { padding:12px 14px; display:flex; align-items:center; gap:8px; cursor:pointer; }
 .rules-header:active { background:#f8f9fa; }
@@ -84,6 +88,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .dot-yellow { background:#e37400; }
 .dot-green { background:#137333; }
 .dot-gray { background:#5f6368; }
+/* Note modal */
+.note-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:200; justify-content:center; align-items:flex-end; }
+.note-overlay.show { display:flex; }
+.note-box { background:#fff; border-radius:14px 14px 0 0; width:100%; max-width:500px; padding:16px; animation:slideUp .25s; }
+@keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+.note-box h3 { font-size:15px; margin-bottom:8px; color:#333; }
+.note-box textarea { width:100%; height:80px; border:1px solid #ddd; border-radius:8px; padding:10px; font-size:14px; resize:none; font-family:inherit; }
+.note-box .btn-row { display:flex; gap:8px; margin-top:10px; justify-content:flex-end; }
+.note-box .btn { padding:8px 20px; border-radius:8px; font-size:14px; border:none; cursor:pointer; }
+.note-box .btn-save { background:#1a73e8; color:#fff; }
+.note-box .btn-cancel { background:#f1f3f4; color:#333; }
+.note-box .btn-del { background:#fff; color:#d93025; border:1px solid #ddd; margin-right:auto; }
 </style>
 </head>
 <body>
@@ -100,40 +116,88 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 
 <div class="footer" id="footer"></div>
 
+<!-- Note modal -->
+<div class="note-overlay" id="noteOverlay" onclick="if(event.target===this)closeNote()">
+  <div class="note-box" onclick="event.stopPropagation()">
+    <h3 id="noteTitle">备注</h3>
+    <textarea id="noteInput" placeholder="输入备注..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-del" id="noteDel" onclick="deleteNote()" style="display:none">删除</button>
+      <button class="btn btn-cancel" onclick="closeNote()">取消</button>
+      <button class="btn btn-save" onclick="saveNote()">保存</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ====== 数据加载 ======
 let DATA = null;
-let currentView = 'overview'; // 'overview' | 'manager'
+let currentView = 'overview';
 let currentManager = null;
 let currentFilter = 'all';
+let noteKey = null; // current editing note key
 
+// ====== Notes (localStorage) ======
+function snKey(mgr, store) { return 'sn|' + mgr + '|' + store; }
+function gnKey(mgr, store, idx) { return 'gn|' + mgr + '|' + store + '|' + idx; }
+function getNote(k) { return localStorage.getItem('notes-' + k) || ''; }
+function setNote(k, v) { if (v) localStorage.setItem('notes-' + k, v); else localStorage.removeItem('notes-' + k); }
+
+function openNote(k, title, existing) {
+  noteKey = k;
+  document.getElementById('noteTitle').textContent = title;
+  document.getElementById('noteInput').value = existing || '';
+  document.getElementById('noteDel').style.display = existing ? '' : 'none';
+  document.getElementById('noteOverlay').classList.add('show');
+  setTimeout(function(){ document.getElementById('noteInput').focus(); }, 300);
+}
+
+function closeNote() {
+  document.getElementById('noteOverlay').classList.remove('show');
+  noteKey = null;
+}
+
+function saveNote() {
+  if (!noteKey) return;
+  var v = document.getElementById('noteInput').value.trim();
+  setNote(noteKey, v);
+  closeNote();
+  renderManagerDetail();
+}
+
+function deleteNote() {
+  if (!noteKey) return;
+  setNote(noteKey, '');
+  closeNote();
+  renderManagerDetail();
+}
+
+// ====== Data loading ======
 async function init() {
   try {
-    const resp = await fetch('data.json');
+    var resp = await fetch('data.json');
     DATA = await resp.json();
   } catch(e) {
     document.getElementById('mainContent').innerHTML =
-      '<div class="empty-state"><div class="icon">⚠</div>无法加载数据文件 data.json<br><small>请确保与 index.html 在同一目录</small></div>';
+      '<div class="empty-state"><div class="icon">⚠</div>无法加载 data.json<br><small>请确保与 index.html 在同一目录</small></div>';
     return;
   }
-  document.getElementById('footer').textContent =
-    '生成时间: ' + DATA.generated;
+  document.getElementById('footer').textContent = '数据生成: ' + DATA.generated + ' | 来源: ' + DATA.sourceSales;
   renderOverview();
 }
 
-// ====== 总览视图 ======
+// ====== Overview ======
 function renderOverview() {
   currentView = 'overview';
   currentManager = null;
-  document.getElementById('title').textContent = '直营门店分销缺口看板';
+  document.getElementById('title').textContent = '门店分销缺口';
   document.getElementById('backBtn').classList.remove('show');
   document.getElementById('headerMeta').textContent = DATA.managers.length + '位负责人';
 
-  // 规则说明（置顶）
-  let html = renderRules();
+  var html = renderRules();
   html += '<div class="card-grid">';
-  for (const m of DATA.managers) {
-    const noGap = m.storeCount - m.gapStoreCount;
+  for (var i = 0; i < DATA.managers.length; i++) {
+    var m = DATA.managers[i];
+    var noGap = m.storeCount - m.gapStoreCount;
     html += '<div class="card" data-manager="' + escHtml(m.name) + '" onclick="onCardClick(this)">';
     html += '<div class="name">' + escHtml(m.name) + '</div>';
     html += '<div class="stats">';
@@ -147,100 +211,107 @@ function renderOverview() {
 }
 
 function renderRules() {
-  return '<div class="rules-card open" id="rulesCard">'
+  return '<div class="rules-card open">'
     + '<div class="rules-header" onclick="this.parentElement.classList.toggle(\'open\')">'
-    + '<span class="rules-title">&#9432; 缺口判定规则说明</span>'
+    + '<span class="rules-title">&#9432; 判定规则与使用说明</span>'
     + '<span class="rules-arrow">&#8250;</span>'
     + '</div>'
     + '<div class="rules-body">'
-    + '<div class="rule-item"><b>产品匹配</b>：只看品牌+品类名，不看规格与包装。例如"金龙鱼芝麻香油400ML"与"金龙鱼芝麻香油220ML"视为同一产品。</div>'
-    + '<div class="rule-item"><b>门店类型</b>：商超A/B→商超AB，农贸菜场店→农贸店。流通批发/批发流通/其它客户无分销标准，标注"无要求"。</div>'
-    + '<div class="rule-item"><b>N选1</b>：标"需2选1"表示该组产品中只需覆盖1个即算满足。门店一个都没覆盖才计为缺口。</div>'
-    + '<div class="rule-item"><b>颜色标记</b>：<span class="tag-dot dot-red"></span>红色=有缺口 <span class="tag-dot dot-yellow"></span>黄色=1-5个缺口 <span class="tag-dot dot-green"></span>绿色=无缺口 <span class="tag-dot dot-gray"></span>灰色=无分销标准</div>'
-    + '</div>'
-    + '</div>';
+    + '<div class="rule-item"><b>产品匹配</b>：优先按产品代码精确匹配，代码不一致时按品牌+品类名后备匹配。</div>'
+    + '<div class="rule-item"><b>门店类型</b>：商超A/B→商超AB，农贸菜场店→农贸店。流通批发/批发流通/其它客户无分销标准。</div>'
+    + '<div class="rule-item"><b>N选1</b>：组内覆盖1个即满足，全无才计缺口。</div>'
+    + '<div class="rule-item"><b>颜色</b>：<span class="tag-dot dot-red"></span>红=有缺口 <span class="tag-dot dot-yellow"></span>黄=1-5个 <span class="tag-dot dot-green"></span>绿=无缺口 <span class="tag-dot dot-gray"></span>灰=无标准</div>'
+    + '<div class="rule-item"><b>备注</b>：点击📝图标可为门店或缺口添加备注，数据保存在本机浏览器中。</div>'
+    + '</div></div>';
 }
 
-// ====== 负责人详情 ======
+// ====== Manager detail ======
 function showManager(name) {
-  currentView = 'manager';
-  currentManager = DATA.managers.find(m => m.name === name);
+  currentManager = DATA.managers.find(function(m) { return m.name === name; });
   if (!currentManager) return;
   currentFilter = 'all';
-
   document.getElementById('title').textContent = currentManager.name;
   document.getElementById('backBtn').classList.add('show');
   document.getElementById('headerMeta').textContent = currentManager.storeCount + '家门店';
-
   renderManagerDetail();
 }
 
 function renderManagerDetail() {
-  const m = currentManager;
-  let stores = m.stores;
+  var m = currentManager;
+  var stores = m.stores.slice();
 
-  // Filter
-  if (currentFilter === 'gap') stores = stores.filter(s => s.gaps.length > 0);
-  else if (currentFilter === 'nogap') stores = stores.filter(s => s.gaps.length === 0 && s.hasStandard);
-  else if (currentFilter === 'nostd') stores = stores.filter(s => !s.hasStandard);
+  if (currentFilter === 'gap') stores = stores.filter(function(s) { return s.gaps.length > 0; });
+  else if (currentFilter === 'nogap') stores = stores.filter(function(s) { return s.gaps.length === 0 && s.hasStandard; });
+  else if (currentFilter === 'nostd') stores = stores.filter(function(s) { return !s.hasStandard; });
 
-  let html = '';
-  // Summary
+  var html = '';
+  // Summary + export
   html += '<div class="summary">';
   html += '<div class="summary-item"><div class="num" style="color:#1a73e8">' + m.storeCount + '</div>总门店</div>';
   html += '<div class="summary-item"><div class="num" style="color:#d93025">' + m.gapStoreCount + '</div>有缺口</div>';
   html += '<div class="summary-item"><div class="num" style="color:#188038">' + (m.storeCount - m.gapStoreCount) + '</div>无缺口</div>';
   html += '</div>';
 
-  // Filter bar
+  // Filters + export
   html += '<div class="filter-bar">';
   html += '<button class="filter-btn' + (currentFilter==='all'?' active':'') + '" onclick="setFilter(\'all\')">全部</button>';
   html += '<button class="filter-btn' + (currentFilter==='gap'?' active':'') + '" onclick="setFilter(\'gap\')">有缺口</button>';
   html += '<button class="filter-btn' + (currentFilter==='nogap'?' active':'') + '" onclick="setFilter(\'nogap\')">无缺口</button>';
-  html += '<button class="filter-btn' + (currentFilter==='nostd'?' active':'') + '" onclick="setFilter(\'nostd\')">无分销标准</button>';
+  html += '<button class="filter-btn' + (currentFilter==='nostd'?' active':'') + '" onclick="setFilter(\'nostd\')">无标准</button>';
+  html += '<button class="export-btn" onclick="exportNotes()">导出备注</button>';
   html += '</div>';
 
   html += '<div class="store-list">';
-  for (const s of stores) {
-    const gapCount = s.gaps.length;
-    let badgeCls, badgeText;
-    if (!s.hasStandard) {
-      badgeCls = 'badge-gray'; badgeText = '无要求';
-    } else if (gapCount === 0) {
-      badgeCls = 'badge-green'; badgeText = '无缺口';
-    } else if (gapCount <= 5) {
-      badgeCls = 'badge-yellow'; badgeText = gapCount + '个缺口';
-    } else {
-      badgeCls = 'badge-red'; badgeText = gapCount + '个缺口';
-    }
+  for (var si = 0; si < stores.length; si++) {
+    var s = stores[si];
+    var gapCount = s.gaps.length;
+    var badgeCls, badgeText;
+    if (!s.hasStandard) { badgeCls = 'badge-gray'; badgeText = '无要求'; }
+    else if (gapCount === 0) { badgeCls = 'badge-green'; badgeText = '无缺口'; }
+    else if (gapCount <= 5) { badgeCls = 'badge-yellow'; badgeText = gapCount + '个缺口'; }
+    else { badgeCls = 'badge-red'; badgeText = gapCount + '个缺口'; }
 
-    html += '<div class="store-item" onclick="toggleStore(this, event)">';
-    html += '<div class="store-header">';
+    var sk = snKey(m.name, s.name);
+    var snote = getNote(sk);
+
+    html += '<div class="store-item">';
+    html += '<div class="store-header" onclick="toggleStore(this, event)">';
     html += '<div class="store-info">';
-    html += '<div class="store-name">' + escHtml(s.name) + '</div>';
+    html += '<div class="store-name">';
+    html += escHtml(s.name);
+    if (snote) html += ' <span class="store-note-preview">' + escHtml(snote.substring(0,15)) + '</span>';
+    html += '</div>';
     html += '<div class="store-type">' + escHtml(s.type) + (s.hasStandard ? '' : ' · 无分销标准') + '</div>';
     html += '</div>';
+    html += '<span class="store-note-icon' + (snote ? ' has-note' : '') + '" onclick="openStoreNote(event, \'' + esc(m.name) + '\', \'' + esc(s.name) + '\')">&#128221;</span>';
     html += '<span class="store-badge ' + badgeCls + '">' + badgeText + '</span>';
     html += '<span class="store-arrow">&#8250;</span>';
     html += '</div>';
 
-    // Gap list
     if (gapCount > 0) {
       html += '<div class="gap-list">';
-      for (const g of s.gaps) {
+      for (var gi = 0; gi < s.gaps.length; gi++) {
+        var g = s.gaps[gi];
+        var gk = gnKey(m.name, s.name, gi);
+        var gnote = getNote(gk);
+
         if (g.requirement === '必须') {
           html += '<div class="gap-item">';
           html += '<span class="gap-line">' + escHtml(g.productLine || '') + '</span>';
-          html += '<span class="gap-text">' + escHtml(g.product) + '</span>';
+          html += '<span class="gap-text">' + escHtml(g.product);
+          if (gnote) html += '<span class="gap-note-txt">' + escHtml(gnote.substring(0, 30)) + '</span>';
+          html += '</span>';
+          html += '<span class="gap-note-btn' + (gnote ? ' has-note' : '') + '" onclick="openGapNote(event, \'' + esc(m.name) + '\', \'' + esc(s.name) + '\', ' + gi + ')">&#9998;</span>';
           html += '</div>';
         } else {
-          // N选1
           html += '<div class="gap-item gap-choose">';
           html += '<span class="gap-line">' + escHtml(g.productLine || '') + '</span>';
           html += '<span class="gap-text">';
           html += '<span class="gap-badge">需' + escHtml(g.requirement) + '</span>';
-          html += g.group.map(p => escHtml(p)).join(' / ');
+          html += g.group.map(function(p) { return escHtml(p); }).join(' / ');
+          if (gnote) html += '<span class="gap-note-txt">' + escHtml(gnote.substring(0, 30)) + '</span>';
           html += '</span>';
+          html += '<span class="gap-note-btn' + (gnote ? ' has-note' : '') + '" onclick="openGapNote(event, \'' + esc(m.name) + '\', \'' + esc(s.name) + '\', ' + gi + ')">&#9998;</span>';
           html += '</div>';
         }
       }
@@ -251,41 +322,66 @@ function renderManagerDetail() {
   html += '</div>';
 
   if (stores.length === 0) {
-    html += '<div class="empty-state"><div class="icon">✓</div>当前筛选条件下无门店</div>';
+    html += '<div class="empty-state">当前筛选条件下无门店</div>';
   }
 
   document.getElementById('mainContent').innerHTML = html;
 }
 
-function setFilter(f) {
-  currentFilter = f;
-  renderManagerDetail();
-}
-
-function toggleStore(el, ev) {
-  el.classList.toggle('open');
+function openStoreNote(ev, mgr, store) {
   ev.stopPropagation();
+  var k = snKey(mgr, store);
+  openNote(k, '门店备注 - ' + store, getNote(k));
 }
 
-function onCardClick(el) {
-  showManager(el.dataset.manager);
+function openGapNote(ev, mgr, store, idx) {
+  ev.stopPropagation();
+  var k = gnKey(mgr, store, idx);
+  openNote(k, '缺口备注', getNote(k));
 }
 
-function goBack() {
-  if (currentView === 'manager') {
-    renderOverview();
+function setFilter(f) { currentFilter = f; renderManagerDetail(); }
+
+function toggleStore(el, ev) { el.classList.toggle('open'); ev.stopPropagation(); }
+
+function onCardClick(el) { showManager(el.dataset.manager); }
+
+function goBack() { if (currentView === 'manager') renderOverview(); }
+
+// ====== Export ======
+function exportNotes() {
+  var m = currentManager;
+  var lines = ['备注导出 - ' + m.name + ' - ' + new Date().toLocaleDateString(), ''];
+  for (var si = 0; si < m.stores.length; si++) {
+    var s = m.stores[si];
+    var sn = getNote(snKey(m.name, s.name));
+    if (sn || s.gaps.some(function(g, gi) { return getNote(gnKey(m.name, s.name, gi)); })) {
+      lines.push('【' + s.name + '】(' + s.type + ')');
+      if (sn) lines.push('  门店备注: ' + sn);
+      for (var gi = 0; gi < s.gaps.length; gi++) {
+        var gn = getNote(gnKey(m.name, s.name, gi));
+        if (gn) {
+          var g = s.gaps[gi];
+          var gdesc = g.requirement === '必须' ? g.product : ('需' + g.requirement + ' ' + g.group.join(' / '));
+          lines.push('  [' + (g.productLine || '') + '] ' + gdesc);
+          lines.push('    备注: ' + gn);
+        }
+      }
+      lines.push('');
+    }
   }
+  if (lines.length <= 2) { alert('暂无备注'); return; }
+  var blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '备注_' + m.name + '_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
 }
 
-// ====== 工具函数 ======
-function esc(s) {
-  return (s||'').replace(/'/g, "\\'").replace(/"/g, '\\"');
-}
-function escHtml(s) {
-  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+// ====== Utils ======
+function esc(s) { return (s||'').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ====== 启动 ======
 init();
 </script>
 </body>
