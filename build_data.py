@@ -65,20 +65,38 @@ def read_distribution_standard(filepath):
         if header:
             col_map[c] = str(header).strip()
 
+    # 建立合并单元格映射：任意被合并的单元格 → 其所属合并区域
+    merged_map = {}  # (row, col) → MergedCellRange
+    for mr in ws.merged_cells.ranges:
+        for row in range(mr.min_row, mr.max_row + 1):
+            for col in range(mr.min_col, mr.max_col + 1):
+                merged_map[(row, col)] = mr
+
+    def get_cell_value(row, col):
+        """读取单元格值，自动处理合并单元格"""
+        cell = ws.cell(row=row, column=col)
+        if cell.value is not None and not isinstance(cell, MergedCell):
+            return str(cell.value).strip()
+        # 被合并覆盖，从合并区域左上角取值
+        mr = merged_map.get((row, col))
+        if mr:
+            top_val = ws.cell(row=mr.min_row, column=mr.min_col).value
+            if top_val is not None:
+                return str(top_val).strip()
+        return None
+
     current_line = None
     products = []
 
     for r in range(3, ws.max_row + 1):
-        # 产线 (Col A)
-        line_cell = ws.cell(row=r, column=1)
-        if line_cell.value and not isinstance(line_cell, MergedCell):
-            current_line = str(line_cell.value).strip()
+        # 产线 (Col A) - 用合并单元格值
+        line_val = get_cell_value(r, 1)
+        if line_val:
+            current_line = line_val
 
         # 产品代码 (Col B) 和 产品名称 (Col C)
-        code_cell = ws.cell(row=r, column=2)
-        name_cell = ws.cell(row=r, column=3)
-        product_code = str(code_cell.value).strip() if code_cell.value and not isinstance(code_cell, MergedCell) else None
-        product_name = str(name_cell.value).strip() if name_cell.value and not isinstance(name_cell, MergedCell) else None
+        product_code = get_cell_value(r, 2)
+        product_name = get_cell_value(r, 3)
 
         if not product_name:
             continue
@@ -90,8 +108,7 @@ def read_distribution_standard(filepath):
         # 读取各门店类型要求
         requirements = {}
         for col_idx, store_type in col_map.items():
-            val = ws.cell(row=r, column=col_idx).value
-            requirements[store_type] = str(val).strip() if val is not None else None
+            requirements[store_type] = get_cell_value(r, col_idx)
 
         products.append({
             'code': product_code,
@@ -100,8 +117,9 @@ def read_distribution_standard(filepath):
             'requirements': requirements,
         })
 
-    # 识别 N选1 分组
+    # 识别 N选1 分组 + 散米桶分组
     groups = []
+    bulk_bins = []  # 散米桶合并显示
     for mr in ws.merged_cells.ranges:
         if mr.min_row < 3:
             continue
@@ -113,6 +131,25 @@ def read_distribution_standard(filepath):
             continue
         val = str(val).strip()
 
+        # 散米桶
+        if '散米桶' in val:
+            store_type = col_map.get(mr.min_col)
+            if not store_type:
+                continue
+            group_products = []
+            for r in range(mr.min_row, mr.max_row + 1):
+                pname = get_cell_value(r, 3)
+                if pname:
+                    group_products.append(pname)
+            if group_products:
+                bulk_bins.append({
+                    'store_type': store_type,
+                    'label': val,
+                    'products': group_products,
+                })
+            continue
+
+        # N选1
         n_choose = None
         if '二选一' in val or val == '2选1':
             n_choose = 2
@@ -127,9 +164,9 @@ def read_distribution_standard(filepath):
 
         group_products = []
         for r in range(mr.min_row, mr.max_row + 1):
-            pname = ws.cell(row=r, column=3).value
+            pname = get_cell_value(r, 3)
             if pname:
-                group_products.append(str(pname).strip())
+                group_products.append(pname)
 
         if group_products:
             groups.append({
@@ -139,7 +176,7 @@ def read_distribution_standard(filepath):
             })
 
     wb.close()
-    return products, groups
+    return products, groups, bulk_bins
 
 
 # ====== 读取门店销量 ======
@@ -225,8 +262,8 @@ def build_data():
     print(f'标准表: {os.path.basename(std_file)}')
 
     print('读取分销标准...')
-    std_products, std_groups = read_distribution_standard(std_file)
-    print(f'  产品数: {len(std_products)}, N选1分组: {len(std_groups)}')
+    std_products, std_groups, bulk_bins = read_distribution_standard(std_file)
+    print(f'  产品数: {len(std_products)}, N选1分组: {len(std_groups)}, 散米桶: {len(bulk_bins)}')
 
     print('读取门店销量...')
     stores = read_store_sales(sales_file)
@@ -293,6 +330,29 @@ def build_data():
                         'productCode': '',
                         'requirement': f'{g["n"]}选1',
                         'group': g['products'],
+                    })
+
+        # 散米桶合并：同一散米桶组的缺口合并为一条
+        if mapped_type:
+            for bb in bulk_bins:
+                if bb['store_type'] != mapped_type:
+                    continue
+                # 找出该组内哪些产品是缺口
+                bb_gap_products = []
+                remaining_gaps = []
+                for g in gaps:
+                    if g.get('product') in bb['products']:
+                        bb_gap_products.append(g['product'])
+                    else:
+                        remaining_gaps.append(g)
+                if bb_gap_products:
+                    gaps = remaining_gaps
+                    gaps.append({
+                        'productLine': '米',
+                        'productCode': '',
+                        'requirement': '散米桶',
+                        'note': bb['label'],
+                        'group': bb_gap_products,
                     })
 
         gaps.sort(key=lambda g: (g.get('productLine', '') or '', g.get('product', '') or ''))
