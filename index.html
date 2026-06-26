@@ -227,6 +227,7 @@ function renderRules() {
 
 // ====== Manager detail ======
 function showManager(name) {
+  currentView = 'manager';
   currentManager = DATA.managers.find(function(m) { return m.name === name; });
   if (!currentManager) return;
   currentFilter = 'all';
