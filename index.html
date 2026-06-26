@@ -347,7 +347,7 @@ function toggleStore(el, ev) { el.parentElement.classList.toggle('open'); ev.sto
 
 function onCardClick(el) { showManager(el.dataset.manager); }
 
-function goBack() { if (currentView === 'manager') renderOverview(); }
+function goBack() { renderOverview(); }
 
 // ====== Export ======
 function exportNotes() {
